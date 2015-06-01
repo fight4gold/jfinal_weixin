@@ -23,6 +23,7 @@ import com.jfinal.weixin.sdk.msg.out.OutMusicMsg;
 import com.jfinal.weixin.sdk.msg.out.OutNewsMsg;
 import com.jfinal.weixin.sdk.msg.out.OutTextMsg;
 import com.jfinal.weixin.sdk.msg.out.OutVoiceMsg;
+import com.jfinal.weixin.robot.TuLing;
 
 /**
  * 将此 DemoController 在YourJFinalConfig 中注册路由，
@@ -75,7 +76,8 @@ public class DemoController extends WeixinController {
 		// 其它文本消息直接返回原值 + 帮助提示
 		else {
 			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
-			outMsg.setContent("\t文本消息已成功接收，内容为： " + inTextMsg.getContent() + "\n\n" + helpStr);
+			//outMsg.setContent("\t文本消息已成功接收，内容为： " + inTextMsg.getContent() + "\n\n" + helpStr);
+			outMsg.setContent(TuLing.getMessage("Hello"));
 			render(outMsg);
 		}
 	}
