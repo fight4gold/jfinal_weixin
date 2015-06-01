@@ -1,6 +1,6 @@
 package com.jfinal.weixin.robot;
 
-import java.io.Exception;
+import java.io.IOException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
