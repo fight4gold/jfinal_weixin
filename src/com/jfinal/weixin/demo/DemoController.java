@@ -86,11 +86,7 @@ public class DemoController extends WeixinController {
 			}else if(res.getCode().equals("305000")){
 				// 列车
 				OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
-				List<InfoEntity> news = res.getList();
-				if(news != null && news.size() > 0){
-					InfoEntity tmp = news.get(0);
-					outMsg.addNews(tmp.getStart()+"->"+tmp.getTerminal(), "共找到" + news.size() + "辆列车", tmp.getIcon(), tmp.getDetailurl());
-				}
+				outMsg.addNews(msgContent, res.getText(), tmp.getIcon(), tmp.getDetailurl());
 				render(outMsg);
 			}else if(res.getCode().equals("306000")){
 				// 航班
