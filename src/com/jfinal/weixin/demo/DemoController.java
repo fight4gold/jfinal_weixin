@@ -87,15 +87,9 @@ public class DemoController extends WeixinController {
 				// 列车
 				OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
 				List<InfoEntity> news = res.getList();
-				if(news != null){
-					Collections.shuffle(news);
-					for(int i=0;i<news.size();i++){
-						InfoEntity tmp = news.get(i);
-						outMsg.addNews(tmp.getTrainnum(), tmp.getStart()+"["+tmp.getStarttime()+"]->"+tmp.getTerminal()+"["+tmp.getEndtime()+"]", tmp.getIcon(), tmp.getDetailurl());
-						if(i==3){
-							break;
-						}
-					}
+				if(news != null && news.size() > 0){
+					InfoEntity tmp = news.get(0);
+					outMsg.addNews(tmp.getStart()+"->"+tmp.getTerminal(), "共找到" + news.size() + "辆列车", tmp.getIcon(), tmp.getDetailurl());
 				}
 				render(outMsg);
 			}else if(res.getCode().equals("306000")){
