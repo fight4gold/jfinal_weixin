@@ -92,9 +92,9 @@ public class DemoController extends WeixinController {
 				    outMsg.addNews(msgContent, res.getText(), tmp.getIcon(), tmp.getDetailurl());
 				    render(outMsg);
 				}else{
-				    OutTextMsg outMsg = new OutTextMsg(inTextMsg);
-				    outMsg.setContent("找不到列车信息哦");
-				    render(outMsg);
+				    OutTextMsg outMsgText = new OutTextMsg(inTextMsg);
+				    outMsgText.setContent("找不到列车信息哦");
+				    render(outMsgText);
 				}
 			}else if(res.getCode().equals("306000")){
 				// 航班
