@@ -25,6 +25,10 @@ import com.jfinal.weixin.sdk.msg.out.OutTextMsg;
 import com.jfinal.weixin.sdk.msg.out.OutVoiceMsg;
 import com.jfinal.weixin.robot.TuLing;
 import com.jfinal.weixin.robot.TuLingResponse;
+import com.jfinal.weixin.robot.InfoEntity;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 将此 DemoController 在YourJFinalConfig 中注册路由，
@@ -44,48 +48,137 @@ public class DemoController extends WeixinController {
 	 */
 	protected void processInTextMsg(InTextMsg inTextMsg) {
 		String msgContent = inTextMsg.getContent().trim();
-		// 帮助提示
-		if ("help".equalsIgnoreCase(msgContent)) {
-			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
-			outMsg.setContent(helpStr);
-			render(outMsg);
-		}
-		// 图文消息测试
-		else if ("news".equalsIgnoreCase(msgContent)) {
-			OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
-			outMsg.addNews("JFinal 1.8 发布，JAVA 极速 WEB+ORM 框架", "现在就加入 JFinal 极速开发世界，节省更多时间去跟女友游山玩水 ^_^", "http://mmbiz.qpic.cn/mmbiz/zz3Q6WSrzq1ibBkhSA1BibMuMxLuHIvUfiaGsK7CC4kIzeh178IYSHbYQ5eg9tVxgEcbegAu22Qhwgl5IhZFWWXUw/0", "http://mp.weixin.qq.com/s?__biz=MjM5ODAwOTU3Mg==&mid=200313981&idx=1&sn=3bc5547ba4beae12a3e8762ababc8175#rd");
-			outMsg.addNews("JFinal 1.6 发布,JAVA极速WEB+ORM框架", "JFinal 1.6 主要升级了 ActiveRecord 插件，本次升级全面支持多数源、多方言、多缓", "http://mmbiz.qpic.cn/mmbiz/zz3Q6WSrzq0fcR8VmNCgugHXv7gVlxI6w95RBlKLdKUTjhOZIHGSWsGvjvHqnBnjIWHsicfcXmXlwOWE6sb39kA/0", "http://mp.weixin.qq.com/s?__biz=MjM5ODAwOTU3Mg==&mid=200121522&idx=1&sn=ee24f352e299b2859673b26ffa4a81f6#rd");
-			render(outMsg);
-		}
-		// 音乐消息测试
-		else if ("music".equalsIgnoreCase(msgContent)) {
-			OutMusicMsg outMsg = new OutMusicMsg(inTextMsg);
-			outMsg.setTitle("Listen To Your Heart");
-			outMsg.setDescription("建议在 WIFI 环境下流畅欣赏此音乐");
-			outMsg.setMusicUrl("http://www.jfinal.com/Listen_To_Your_Heart.mp3");
-			outMsg.setHqMusicUrl("http://www.jfinal.com/Listen_To_Your_Heart.mp3");
-			outMsg.setFuncFlag(true);
-			render(outMsg);
-		}
-		else if ("美女".equalsIgnoreCase(msgContent)) {
-			OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
-			outMsg.addNews("我们只看美女", "又一大波美女来袭，我们只看美女 ^_^", "https://mmbiz.qlogo.cn/mmbiz/zz3Q6WSrzq3DmIGiadDEicRIp69r1iccicwKEUOKuLhYgjibyU96ia581gCf5o3kicqz6ZLdsDyUtLib0q0hdgHtZOf4Wg/0", "http://mp.weixin.qq.com/s?__biz=MjM5ODAwOTU3Mg==&mid=202080887&idx=1&sn=0649c67de565e2d863bf3b8feee24da0#rd");
-			// outMsg.addNews("秀色可餐", "JFinal Weixin 极速开发就是这么爽，有木有 ^_^", "http://mmbiz.qpic.cn/mmbiz/zz3Q6WSrzq2GJLC60ECD7rE7n1cvKWRNFvOyib4KGdic3N5APUWf4ia3LLPxJrtyIYRx93aPNkDtib3ADvdaBXmZJg/0", "http://mp.weixin.qq.com/s?__biz=MjM5ODAwOTU3Mg==&mid=200987822&idx=1&sn=7eb2918275fb0fa7b520768854fb7b80#rd");
-			
-			render(outMsg);
-		}
-		// 其它文本消息直接返回原值 + 帮助提示
-		else {
-			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
-			//outMsg.setContent("\t文本消息已成功接收，内容为： " + inTextMsg.getContent() + "\n\n" + helpStr);
-			TuLingResponse res = TuLing.getMessage(msgContent);
-			if(res != null){
-			    outMsg.setContent(res.getText());
+		TuLingResponse res = TuLing.getMessage(msgContent);
+		
+		if(res != null){
+			if(res.getCode().equals("100000")){
+				OutTextMsg outMsg = new OutTextMsg(inTextMsg);
+				outMsg.setContent(res.getText());
+				render(outMsg);
+			}else if(res.getCode().equals("302000")){
+				OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
+				List<InfoEntity> news = res.getList();
+				if(news != null){
+					Collections.shuffle(news);
+					for(int i=0;i<news.size();i++){
+						InfoEntity tmp = news.get(i);
+						outMsg.addNews(tmp.getArticle(), "", tmp.getIcon(), tmp.getDetailurl());
+						if(i==3){
+							break;
+						}
+					}
+				}
+				render(outMsg);
+			}else if(res.getCode().equals("308000")){
+				OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
+				List<InfoEntity> news = res.getList();
+				if(news != null){
+					Collections.shuffle(news);
+					for(int i=0;i<news.size();i++){
+						InfoEntity tmp = news.get(i);
+						outMsg.addNews(tmp.getName(), tmp.getInfo(), tmp.getIcon(), tmp.getDetailurl());
+						if(i==3){
+							break;
+						}
+					}
+				}
+				render(outMsg);
+			}else if(res.getCode().equals("305000")){
+				// 列车
+				OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
+				List<InfoEntity> news = res.getList();
+				if(news != null){
+					Collections.shuffle(news);
+					for(int i=0;i<news.size();i++){
+						InfoEntity tmp = news.get(i);
+						outMsg.addNews(tmp.getTrainnum(), tmp.getStart()+"["+tmp.getStarttime()+"]->"+tmp.getTerminal()+"["+tmp.getEndtime()+"]", tmp.getIcon(), tmp.getDetailurl());
+						if(i==3){
+							break;
+						}
+					}
+				}
+				render(outMsg);
+			}else if(res.getCode().equals("306000")){
+				// 航班
+				OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
+				List<InfoEntity> news = res.getList();
+				if(news != null){
+					Collections.shuffle(news);
+					for(int i=0;i<news.size();i++){
+						InfoEntity tmp = news.get(i);
+						outMsg.addNews(tmp.getFlight(), tmp.getRoute(), tmp.getIcon(), tmp.getDetailurl());
+						if(i==3){
+							break;
+						}
+					}
+				}
+				render(outMsg);
+			}else if("music".equalsIgnoreCase(msgContent)){
+				// music
+				OutMusicMsg outMsg = new OutMusicMsg(inTextMsg);
+				outMsg.setTitle("Listen To Your Heart");
+				outMsg.setDescription("建议在 WIFI 环境下流畅欣赏此音乐");
+				outMsg.setMusicUrl("http://www.jfinal.com/Listen_To_Your_Heart.mp3");
+				outMsg.setHqMusicUrl("http://www.jfinal.com/Listen_To_Your_Heart.mp3");
+				outMsg.setFuncFlag(true);
+				render(outMsg);
+			}else if("美女".equalsIgnoreCase(msgContent)){
+				OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
+				outMsg.addNews("我们只看美女", "又一大波美女来袭，我们只看美女 ^_^", "https://mmbiz.qlogo.cn/mmbiz/zz3Q6WSrzq3DmIGiadDEicRIp69r1iccicwKEUOKuLhYgjibyU96ia581gCf5o3kicqz6ZLdsDyUtLib0q0hdgHtZOf4Wg/0", "http://mp.weixin.qq.com/s?__biz=MjM5ODAwOTU3Mg==&mid=202080887&idx=1&sn=0649c67de565e2d863bf3b8feee24da0#rd");
+				render(outMsg);
 			}else{
-			    outMsg.setContent(defaultReply);
+				OutTextMsg outMsg = new OutTextMsg(inTextMsg);
+				outMsg.setContent(defaultReply);
+				render(outMsg);
 			}
+		}else{
+			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
+			outMsg.setContent(defaultReply);
 			render(outMsg);
 		}
+		
+		// 帮助提示
+// 		if ("help".equalsIgnoreCase(msgContent)) {
+// 			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
+// 			outMsg.setContent(helpStr);
+// 			render(outMsg);
+// 		}
+// 		// 图文消息测试
+// 		else if ("news".equalsIgnoreCase(msgContent)) {
+// 			OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
+// 			outMsg.addNews("JFinal 1.8 发布，JAVA 极速 WEB+ORM 框架", "现在就加入 JFinal 极速开发世界，节省更多时间去跟女友游山玩水 ^_^", "http://mmbiz.qpic.cn/mmbiz/zz3Q6WSrzq1ibBkhSA1BibMuMxLuHIvUfiaGsK7CC4kIzeh178IYSHbYQ5eg9tVxgEcbegAu22Qhwgl5IhZFWWXUw/0", "http://mp.weixin.qq.com/s?__biz=MjM5ODAwOTU3Mg==&mid=200313981&idx=1&sn=3bc5547ba4beae12a3e8762ababc8175#rd");
+// 			outMsg.addNews("JFinal 1.6 发布,JAVA极速WEB+ORM框架", "JFinal 1.6 主要升级了 ActiveRecord 插件，本次升级全面支持多数源、多方言、多缓", "http://mmbiz.qpic.cn/mmbiz/zz3Q6WSrzq0fcR8VmNCgugHXv7gVlxI6w95RBlKLdKUTjhOZIHGSWsGvjvHqnBnjIWHsicfcXmXlwOWE6sb39kA/0", "http://mp.weixin.qq.com/s?__biz=MjM5ODAwOTU3Mg==&mid=200121522&idx=1&sn=ee24f352e299b2859673b26ffa4a81f6#rd");
+// 			render(outMsg);
+// 		}
+// 		// 音乐消息测试
+// 		else if ("music".equalsIgnoreCase(msgContent)) {
+// 			OutMusicMsg outMsg = new OutMusicMsg(inTextMsg);
+// 			outMsg.setTitle("Listen To Your Heart");
+// 			outMsg.setDescription("建议在 WIFI 环境下流畅欣赏此音乐");
+// 			outMsg.setMusicUrl("http://www.jfinal.com/Listen_To_Your_Heart.mp3");
+// 			outMsg.setHqMusicUrl("http://www.jfinal.com/Listen_To_Your_Heart.mp3");
+// 			outMsg.setFuncFlag(true);
+// 			render(outMsg);
+// 		}
+// 		else if ("美女".equalsIgnoreCase(msgContent)) {
+// 			OutNewsMsg outMsg = new OutNewsMsg(inTextMsg);
+// 			outMsg.addNews("我们只看美女", "又一大波美女来袭，我们只看美女 ^_^", "https://mmbiz.qlogo.cn/mmbiz/zz3Q6WSrzq3DmIGiadDEicRIp69r1iccicwKEUOKuLhYgjibyU96ia581gCf5o3kicqz6ZLdsDyUtLib0q0hdgHtZOf4Wg/0", "http://mp.weixin.qq.com/s?__biz=MjM5ODAwOTU3Mg==&mid=202080887&idx=1&sn=0649c67de565e2d863bf3b8feee24da0#rd");
+// 			// outMsg.addNews("秀色可餐", "JFinal Weixin 极速开发就是这么爽，有木有 ^_^", "http://mmbiz.qpic.cn/mmbiz/zz3Q6WSrzq2GJLC60ECD7rE7n1cvKWRNFvOyib4KGdic3N5APUWf4ia3LLPxJrtyIYRx93aPNkDtib3ADvdaBXmZJg/0", "http://mp.weixin.qq.com/s?__biz=MjM5ODAwOTU3Mg==&mid=200987822&idx=1&sn=7eb2918275fb0fa7b520768854fb7b80#rd");
+			
+// 			render(outMsg);
+// 		}
+// 		// 其它文本消息直接返回原值 + 帮助提示
+// 		else {
+// 			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
+// 			//outMsg.setContent("\t文本消息已成功接收，内容为： " + inTextMsg.getContent() + "\n\n" + helpStr);
+// 			TuLingResponse res = TuLing.getMessage(msgContent);
+// 			if(res != null){
+// 			    outMsg.setContent(res.getText());
+// 			}else{
+// 			    outMsg.setContent(defaultReply);
+// 			}
+// 			render(outMsg);
+// 		}
 	}
 	
 	/**
