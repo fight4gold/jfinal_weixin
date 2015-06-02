@@ -6,6 +6,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import com.google.gson.Gson;
+import java.net.URLEncoder;
 
 public class TuLing {
     private static Gson gson = new Gson();
@@ -13,6 +14,7 @@ public class TuLing {
 		TuLingResponse result = null;
 		String resultStr = null;
 		try{
+		    param = URLEncoder.encode(param,"UTF-8");
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			HttpGet httpGet = new HttpGet("http://www.tuling123.com/openapi/api?key=4d5ed869bfef66623dcdaf5643ff9a8f&info=" + param);
 			CloseableHttpResponse response = httpclient.execute(httpGet);

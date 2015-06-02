@@ -35,7 +35,7 @@ import com.jfinal.weixin.robot.TuLingResponse;
 public class DemoController extends WeixinController {
 	
 	private static final String helpStr = "\t发送 help 可获得帮助，发送 \"美女\" 可看美女，发送 news 可看新闻，发送 music 可听音乐，你还可以试试发送图片、语音、位置、收藏等信息，看会有什么 。公众号持续更新中，想要更多惊喜欢迎每天关注 ^_^";
-	
+	private static final String defaultReply = "我听不懂你在说什么哦";
 	/**
 	 * 实现父类抽方法，处理文本消息
 	 * 本例子中根据消息中的不同文本内容分别做出了不同的响应，同时也是为了测试 jfinal weixin sdk的基本功能：
@@ -78,8 +78,12 @@ public class DemoController extends WeixinController {
 		else {
 			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
 			//outMsg.setContent("\t文本消息已成功接收，内容为： " + inTextMsg.getContent() + "\n\n" + helpStr);
-			TuLingResponse res = TuLing.getMessage("你是美女吗");
-			outMsg.setContent(res.getText());
+			TuLingResponse res = TuLing.getMessage(msgContent);
+			if(res != null){
+			    outMsg.setContent(res.getText());
+			}else{
+			    outMsg.setContent(defaultReply);
+			}
 			render(outMsg);
 		}
 	}
