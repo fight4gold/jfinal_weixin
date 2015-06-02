@@ -5,9 +5,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import com.google.gson.Gson;
 
 public class TuLing {
-public static TuLingResponse getMessage(String param) {
+    private static Gson gson = new Gson();
+    public static TuLingResponse getMessage(String param) {
 		TuLingResponse result = null;
 		String resultStr = null;
 		try{
