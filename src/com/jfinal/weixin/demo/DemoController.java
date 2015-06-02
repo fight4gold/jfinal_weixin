@@ -24,6 +24,7 @@ import com.jfinal.weixin.sdk.msg.out.OutNewsMsg;
 import com.jfinal.weixin.sdk.msg.out.OutTextMsg;
 import com.jfinal.weixin.sdk.msg.out.OutVoiceMsg;
 import com.jfinal.weixin.robot.TuLing;
+import com.jfinal.weixin.robot.TuLingResponse;
 
 /**
  * 将此 DemoController 在YourJFinalConfig 中注册路由，
@@ -77,7 +78,8 @@ public class DemoController extends WeixinController {
 		else {
 			OutTextMsg outMsg = new OutTextMsg(inTextMsg);
 			//outMsg.setContent("\t文本消息已成功接收，内容为： " + inTextMsg.getContent() + "\n\n" + helpStr);
-			outMsg.setContent(TuLing.getMessage("Hello"));
+			TuLingResponse res = TuLing.getMessage("你是美女吗");
+			outMsg.setContent(res.getText());
 			render(outMsg);
 		}
 	}
